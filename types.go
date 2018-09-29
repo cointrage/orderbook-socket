@@ -5,3 +5,8 @@ type OrderBook struct {
 	Asks [][]float64
 	Bids [][]float64
 }
+
+type OrderBookDiff struct {
+	FirstUpdateId int64
+	OrderBook
+}
