@@ -11,6 +11,32 @@ func (x byPriceAsc) Len() int { return len(x) }
 func (x byPriceAsc) Less(i, j int) bool { return x[i][0] < x[j][0] }
 func (x byPriceAsc) Swap(i, j int) { x[i], x[j] = x[j], x[i] }
 
+// Copies orderbook values to new structure
+func Copy(book *OrderBook) (*OrderBook) {
+	
+	if book == nil {
+		return nil
+	}
+
+	cp := &OrderBook{
+		LastUpdateId: (*book).LastUpdateId,
+		Market: (*book).Market,
+		Ticker: (*book).Ticker,
+		Asks: make([][]float64, 0),
+		Bids: make([][]float64, 0)
+	}
+
+	for _, ask := range (*book).Asks {
+		cp.Asks = append(cp.Asks, []float64{ask[0], ask[1]})
+	}
+
+	for _, bid := range (*book).Bids {
+		cp.Bids = append(cp.Bids, []float64{bid[0], bid[1]})
+	}
+
+	return cp
+}
+
 // Makes compact representation of differences between two orderbooks
 func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 	if o1 == nil || o2 == nil {
