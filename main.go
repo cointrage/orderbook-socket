@@ -4,11 +4,11 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
 	"orderbook"
-	"encoding/json"
 )
 
 const (
@@ -19,7 +19,7 @@ const (
 type client chan<- string // an outgoing message channel
 
 type clientMessage struct {
-	Client client
+	Client  client
 	Message string
 }
 
@@ -31,12 +31,12 @@ const (
 
 var (
 	entering = make(chan client)
-	leaving = make(chan client)
+	leaving  = make(chan client)
 	messages = make(chan *clientMessage) // all incoming messages
 )
 
 func main() {
-	
+
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", socketHost, socketPort))
 	if err != nil {
 		log.Fatal(err)
@@ -59,56 +59,56 @@ func main() {
 }
 
 func broadcaster() {
-	
-	clients := make(map[client]bool) // all connected clients
+
+	clients := make(map[client]bool)     // all connected clients
 	subscribers := make(map[client]bool) // subscribers for broadcasting
 
 	for {
 		select {
-			case msg := <-messages:
+		case msg := <-messages:
 
-				// decoding message
-				var message Message
-				if err := json.Unmarshal([]byte((*msg).Message), &message); err != nil {
-					log.Printf("could not parse incoming message: %v", (*msg).Message)
-					continue
+			// decoding message
+			var message Message
+			if err := json.Unmarshal([]byte((*msg).Message), &message); err != nil {
+				log.Printf("could not parse incoming message: %v", (*msg).Message)
+				continue
+			}
+
+			switch message.Type {
+			case messageTypeSubscribe:
+				// registering client as subscriber
+				subscribers[(*msg).Client] = true
+
+			case messageTypeOrderbook:
+				// broadcast orderbook message to all subscribers
+				for cli := range subscribers {
+					cli <- (*msg).Message
 				}
 
-				switch message.Type {
-					case messageTypeSubscribe:
-						// registering client as subscriber
-						subscribers[(*msg).Client] = true
-
-					case messageTypeOrderbook:
-						// broadcast orderbook message to all subscribers
-						for cli := range subscribers {
-							cli <- (*msg).Message
-						}
-
-					case messageTypeOrderbookDiff:
-						// broadcast orderbook message to all subscribers
-						for cli := range subscribers {
-							cli <- (*msg).Message
-						}
-
-					default:
-						log.Printf("unknown message type received: %s", (*msg).Message)
+			case messageTypeOrderbookDiff:
+				// broadcast orderbook message to all subscribers
+				for cli := range subscribers {
+					cli <- (*msg).Message
 				}
 
-			case cli := <-entering:
-				clients[cli] = true
+			default:
+				log.Printf("unknown message type received: %s", (*msg).Message)
+			}
 
-			case cli := <-leaving:
-				delete(clients, cli)
-				delete(subscribers, cli)
+		case cli := <-entering:
+			clients[cli] = true
 
-				close(cli)
+		case cli := <-leaving:
+			delete(clients, cli)
+			delete(subscribers, cli)
+
+			close(cli)
 		}
 	}
 }
 
 func handleConn(conn net.Conn) {
-	
+
 	ch := make(chan string) // outgoing client messages
 	clientAddr := conn.RemoteAddr().String()
 
