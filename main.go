@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"orderbook"
+	"./orderbook"
 )
 
 const (
@@ -68,7 +68,7 @@ func broadcaster() {
 		case msg := <-messages:
 
 			// decoding message
-			var message Message
+			var message orderbook.Message
 			if err := json.Unmarshal([]byte((*msg).Message), &message); err != nil {
 				log.Printf("could not parse incoming message: %v", (*msg).Message)
 				continue

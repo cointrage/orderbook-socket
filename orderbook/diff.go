@@ -12,18 +12,20 @@ func (x byPriceAsc) Less(i, j int) bool { return x[i][0] < x[j][0] }
 func (x byPriceAsc) Swap(i, j int) { x[i], x[j] = x[j], x[i] }
 
 // Makes compact representation of differences between two orderbooks
-func MakeDiff(o1 *OrderBook, o2 *OrderBook2) (*OrderBookDiff, error) {
+func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 	if o1 == nil || o2 == nil {
 		return nil, fmt.Errorf("orderbooks should be defined")
 	}
 
 	diff := &OrderBookDiff{
 		FirstUpdateId: (*o1).LastUpdateId,
-		LastUpdateId: (*o2).LastUpdateI	d,
+		OrderBook: OrderBook{
+			LastUpdateId: (*o2).LastUpdateId,
+		},
 	}
 
 	// building asks diff
-	asks := make([][]float64)
+	asks := make([][]float64, 0)
 	for _, ask1 := range (*o1).Asks {
 
 		found := false
@@ -62,7 +64,7 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook2) (*OrderBookDiff, error) {
 	diff.Asks = asks
 
 	// building bids diff
-	bids := make([][]float64)
+	bids := make([][]float64, 0)
 	for _, bid1 := range (*o1).Bids {
 
 		found := false
@@ -142,7 +144,7 @@ func ApplyDiff(book *OrderBook, diff *OrderBookDiff) (error) {
 				// inserting a new price level at (i)-th position
 				(*book).Asks = append((*book).Asks, []float64{})
 				copy((*book).Asks[i+1:], (*book).Asks[i:])
-				(*book).Asks[i] = []float64{àsk[0], ask[1]}
+				(*book).Asks[i] = []float64{ask[0], ask[1]}
 			}
 
 			break
