@@ -23,7 +23,7 @@ func Copy(book *OrderBook) (*OrderBook) {
 		Market: (*book).Market,
 		Ticker: (*book).Ticker,
 		Asks: make([][]float64, 0),
-		Bids: make([][]float64, 0)
+		Bids: make([][]float64, 0),
 	}
 
 	for _, ask := range (*book).Asks {
