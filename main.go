@@ -122,7 +122,7 @@ func handleConn(conn net.Conn) {
 	input := bufio.NewScanner(conn)
 	for input.Scan() {
 		txt := input.Text()
-		log.Printf("got messaage from client %s: %s", clientAddr, txt)
+		log.Printf("got message from client %s: %s", clientAddr, txt[:80])
 		messages <- &clientMessage{ch, txt}
 	}
 
