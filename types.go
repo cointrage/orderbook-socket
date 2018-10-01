@@ -12,7 +12,7 @@ type OrderBookDiff struct {
 }
 
 type Message struct {
-	ts int64
-	type string
-	data string
+	Ts int64
+	Type string
+	Data string
 }

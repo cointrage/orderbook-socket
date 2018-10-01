@@ -7,27 +7,42 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"orderbook"
+	"encoding/json"
 )
-
-type client chan<- string // an outgoing message channel
 
 const (
 	socketHost = "localhost"
 	socketPort = 3009
 )
 
+type client chan<- string // an outgoing message channel
+
+type clientMessage struct {
+	Client client
+	Message string
+}
+
+const (
+	messageTypeSubscribe     = "subscribe"
+	messageTypeOrderbook     = "orderbook"
+	messageTypeOrderbookDiff = "orderbookdiff"
+)
+
 var (
 	entering = make(chan client)
 	leaving = make(chan client)
-	messages = make(chan string) // all incoming client messages
+	messages = make(chan *clientMessage) // all incoming messages
 )
 
 func main() {
 	
-	listener, err := net.Listen("tcp", socketHost + ":" + socketPort)
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", socketHost, socketPort))
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Printf("listening on port: %d", socketPort)
 
 	go broadcaster()
 
@@ -46,13 +61,38 @@ func main() {
 func broadcaster() {
 	
 	clients := make(map[client]bool) // all connected clients
-	
+	subscribers := make(map[client]bool) // subscribers for broadcasting
+
 	for {
 		select {
 			case msg := <-messages:
-				// broadcast incoming message to all
-				for cli := range clients {
-					cli <- msg
+
+				// decoding message
+				var message Message
+				if err := json.Unmarshal([]byte((*msg).Message), &message); err != nil {
+					log.Printf("could not parse incoming message: %v", (*msg).Message)
+					continue
+				}
+
+				switch message.Type {
+					case messageTypeSubscribe:
+						// registering client as subscriber
+						subscribers[(*msg).Client] = true
+
+					case messageTypeOrderbook:
+						// broadcast orderbook message to all subscribers
+						for cli := range subscribers {
+							cli <- (*msg).Message
+						}
+
+					case messageTypeOrderbookDiff:
+						// broadcast orderbook message to all subscribers
+						for cli := range subscribers {
+							cli <- (*msg).Message
+						}
+
+					default:
+						log.Printf("unknown message type received: %s", (*msg).Message)
 				}
 
 			case cli := <-entering:
@@ -60,6 +100,8 @@ func broadcaster() {
 
 			case cli := <-leaving:
 				delete(clients, cli)
+				delete(subscribers, cli)
+
 				close(cli)
 		}
 	}
@@ -68,24 +110,34 @@ func broadcaster() {
 func handleConn(conn net.Conn) {
 	
 	ch := make(chan string) // outgoing client messages
+	clientAddr := conn.RemoteAddr().String()
 
 	go clientWriter(conn, ch)
 
+	// registering client
+	log.Printf("new socket client %s connected", clientAddr)
 	entering <- ch
 
+	// reading input
 	input := bufio.NewScanner(conn)
 	for input.Scan() {
-		messages <- input.Text()
+		txt := input.Text()
+		log.Printf("got messaage from client %s: %s", clientAddr, txt)
+		messages <- &clientMessage{ch, txt}
 	}
 
 	// NOTE: ignoring potential errors from input.Err()
 
+	// deregistering client
 	leaving <- ch
+	log.Printf("socket client %s disconnected", clientAddr)
+
+	// closing socket connection
 	conn.Close()
 }
 
 func clientWriter(conn net.Conn, ch <-chan string) {
-	for msg:= range ch {
+	for msg := range ch {
 		fmt.Fprintln(conn, msg) // NOTE: ignoring network errors
 	}
 }
