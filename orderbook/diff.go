@@ -20,6 +20,7 @@ func Copy(book *OrderBook) (*OrderBook) {
 
 	cp := &OrderBook{
 		LastUpdateId: (*book).LastUpdateId,
+		Exchange: (*book).Exchange,
 		Market: (*book).Market,
 		Ticker: (*book).Ticker,
 		Asks: make([][]float64, 0),
