@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"./orderbook"
+	"github.com/cointrage/orderbook-socket/orderbook"
 )
 
 const (
