@@ -10,3 +10,9 @@ type OrderBookDiff struct {
 	FirstUpdateId int64
 	OrderBook
 }
+
+type Message struct {
+	ts int64
+	type string
+	data string
+}
