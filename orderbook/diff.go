@@ -221,3 +221,18 @@ func ApplyDiff(book *OrderBook, diff *OrderBookDiff) (error) {
 
 	return nil
 }
+
+func Print(orderbook *OrderBook) {
+
+	fmt.Printf("\033[0;0H\n")
+
+	for i := 4; i >= 0; i -= 1 {
+		fmt.Printf("%0.10f \t %0.10f\n", orderbook.Asks[i][0], orderbook.Asks[i][1])
+	}
+
+	fmt.Println("------------------------------")
+
+	for _, bid := range orderbook.Bids[:5] {
+		fmt.Printf("%0.10f \t %0.10f\n", bid[0], bid[1])
+	}
+}

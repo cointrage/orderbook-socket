@@ -70,7 +70,7 @@ func broadcaster() {
 			// decoding message
 			var message orderbook.Message
 			if err := json.Unmarshal([]byte((*msg).Message), &message); err != nil {
-				log.Printf("could not parse incoming message: %v", (*msg).Message)
+				log.Printf("could not parse incoming message: %v, %v", err, (*msg).Message)
 				continue
 			}
 
