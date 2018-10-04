@@ -12,7 +12,6 @@ import (
 )
 
 const (
-	socketHost = "localhost"
 	socketPort = 3009
 )
 
@@ -37,7 +36,7 @@ var (
 
 func main() {
 
-	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", socketHost, socketPort))
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", socketPort))
 	if err != nil {
 		log.Fatal(err)
 	}
