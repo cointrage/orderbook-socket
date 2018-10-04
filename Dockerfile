@@ -1,5 +1,7 @@
 FROM golang:latest 
 
+EXPOSE 3009
+
 RUN mkdir /app 
 ADD . /app/ 
 
