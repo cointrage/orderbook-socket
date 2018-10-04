@@ -5,6 +5,8 @@ ADD . /app/
 
 WORKDIR /app 
 
+RUN go get github.com/cointrage/orderbook-socket/orderbook
+
 RUN go build -o main . 
 
 CMD ["/app/main"]
