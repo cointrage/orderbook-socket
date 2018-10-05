@@ -118,15 +118,16 @@ func handleConn(conn net.Conn) {
 	entering <- ch
 
 	// reading input
-	input := bufio.NewScanner(conn)
-	for input.Scan() {
-		txt := input.Text()
-		//log.Printf("got message from client %s: %s", clientAddr, txt[:150])
-		
-		messages <- &clientMessage{ch, txt}
-	}
+	r := bufio.NewReader(conn)
+	for {
+		str, err := r.ReadString('\n')
+		if err != nil {
+			log.Printf("socket read error: %v", err)
+			break
+		}
 
-	// NOTE: ignoring potential errors from input.Err()
+		messages <- &clientMessage{ch, str}
+	}
 
 	// deregistering client
 	leaving <- ch
