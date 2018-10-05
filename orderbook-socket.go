@@ -126,7 +126,7 @@ func handleConn(conn net.Conn) {
 			break
 		}
 
-		messages <- &clientMessage{ch, str}
+		messages <- &clientMessage{ch, str[:len(str)-1]}
 	}
 
 	// deregistering client
