@@ -1,5 +1,9 @@
 package orderbook
 
+import (
+	"time"
+)
+
 type OrderBook struct {
 	LastUpdateId int64
 	Exchange, Market, Ticker string
@@ -13,7 +17,7 @@ type OrderBookDiff struct {
 }
 
 type Message struct {
-	Ts int64
+	Ts time.Time
 	Type string
 	Data string
 }
