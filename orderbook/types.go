@@ -72,7 +72,7 @@ type Message struct {
 	Data string
 }
 
-func ParseMarket(string market) (MarketName, error) {
+func ParseMarket(market string) (MarketName, error) {
 	switch market {
 	case "BTC":
 		return BTC, nil
