@@ -75,15 +75,15 @@ type Message struct {
 func ParseMarket(market string) (MarketName) {
 	switch market {
 	case "BTC":
-		return BTC, nil
+		return BTC
 	case "ETH":
-		return ETH, nil
+		return ETH
 	case "USDT":
-		return USDT, nil
+		return USDT
 	case "TUSD":
-		return TUSD, nil
+		return TUSD
 	case "USD":
-		return USD, nil
+		return USD
 	default:
 		panic(fmt.Errorf("could not parse market: %s", market))
 	}
