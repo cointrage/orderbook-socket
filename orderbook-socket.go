@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"github.com/cointrage/orderbook-socket/orderbook"
+	"./orderbook"
 )
 
 const (
@@ -21,12 +21,6 @@ type clientMessage struct {
 	Client  client
 	Message string
 }
-
-const (
-	messageTypeSubscribe     = "subscribe"
-	messageTypeOrderbook     = "orderbook"
-	messageTypeOrderbookDiff = "orderbookdiff"
-)
 
 var (
 	entering = make(chan client)
@@ -74,17 +68,17 @@ func broadcaster() {
 			}
 
 			switch message.Type {
-			case messageTypeSubscribe:
+			case orderbook.MessageSubscribe:
 				// registering client as subscriber
 				subscribers[(*msg).Client] = true
 
-			case messageTypeOrderbook:
+			case orderbook.MessageBook:
 				// broadcast orderbook message to all subscribers
 				for cli := range subscribers {
 					cli <- (*msg).Message
 				}
 
-			case messageTypeOrderbookDiff:
+			case orderbook.MessageDiff:
 				// broadcast orderbook message to all subscribers
 				for cli := range subscribers {
 					cli <- (*msg).Message

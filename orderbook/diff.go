@@ -5,7 +5,7 @@ import (
 	"sort"
 )
 
-type byPriceAsc [][]float64
+type byPriceAsc [][]float32
 
 func (x byPriceAsc) Len() int { return len(x) }
 func (x byPriceAsc) Less(i, j int) bool { return x[i][0] < x[j][0] }
@@ -23,16 +23,16 @@ func Copy(book *OrderBook) (*OrderBook) {
 		Exchange: (*book).Exchange,
 		Market: (*book).Market,
 		Ticker: (*book).Ticker,
-		Asks: make([][]float64, 0),
-		Bids: make([][]float64, 0),
+		Asks: make([][]float32, 0),
+		Bids: make([][]float32, 0),
 	}
 
 	for _, ask := range (*book).Asks {
-		cp.Asks = append(cp.Asks, []float64{ask[0], ask[1]})
+		cp.Asks = append(cp.Asks, []float32{ask[0], ask[1]})
 	}
 
 	for _, bid := range (*book).Bids {
-		cp.Bids = append(cp.Bids, []float64{bid[0], bid[1]})
+		cp.Bids = append(cp.Bids, []float32{bid[0], bid[1]})
 	}
 
 	return cp
@@ -52,7 +52,7 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 	}
 
 	// building asks diff
-	asks := make([][]float64, 0)
+	asks := make([][]float32, 0)
 	for _, ask1 := range (*o1).Asks {
 
 		found := false
@@ -65,7 +65,7 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 
 		if !found {
 			// removing the price level
-			asks = append(asks, []float64{ask1[0], 0})
+			asks = append(asks, []float32{ask1[0], 0})
 		}
 	}
 
@@ -75,14 +75,14 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 		for _, ask1 := range (*o1).Asks {
 			if ask2[0] == ask1[0] && ask2[1] != ask1[1] {
 				// updating price level
-				asks = append(asks, []float64{ask2[0], ask2[1]})
+				asks = append(asks, []float32{ask2[0], ask2[1]})
 				break
 			}
 		}
 
 		if !found {
 			// adding price level
-			asks = append(asks, []float64{ask2[0], ask2[1]})
+			asks = append(asks, []float32{ask2[0], ask2[1]})
 		}
 	}
 
@@ -91,7 +91,7 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 	diff.Asks = asks
 
 	// building bids diff
-	bids := make([][]float64, 0)
+	bids := make([][]float32, 0)
 	for _, bid1 := range (*o1).Bids {
 
 		found := false
@@ -104,7 +104,7 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 
 		if !found {
 			// removing the price level
-			bids = append(bids, []float64{bid1[0], 0})
+			bids = append(bids, []float32{bid1[0], 0})
 		}
 	}
 
@@ -114,14 +114,14 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 		for _, bid1 := range (*o1).Bids {
 			if bid2[0] == bid1[0] && bid2[1] != bid1[1] {
 				// updating price level
-				bids = append(bids, []float64{bid2[0], bid2[1]})
+				bids = append(bids, []float32{bid2[0], bid2[1]})
 				break
 			}
 		}
 
 		if !found {
 			// adding price level
-			bids = append(bids, []float64{bid2[0], bid2[1]})
+			bids = append(bids, []float32{bid2[0], bid2[1]})
 		}
 	}
 
@@ -142,7 +142,7 @@ func ApplyDiff(book *OrderBook, diff *OrderBookDiff) (error) {
 	for _, ask := range (*diff).Asks {
 		if len((*book).Asks) == 0 || (*book).Asks[len((*book).Asks) - 1][0] < ask[0] {
 			// inserting at the end
-			(*book).Asks = append((*book).Asks, []float64{ask[0], ask[1]})
+			(*book).Asks = append((*book).Asks, []float32{ask[0], ask[1]})
 			continue
 		}
 
@@ -169,9 +169,9 @@ func ApplyDiff(book *OrderBook, diff *OrderBookDiff) (error) {
 				}
 
 				// inserting a new price level at (i)-th position
-				(*book).Asks = append((*book).Asks, []float64{})
+				(*book).Asks = append((*book).Asks, []float32{})
 				copy((*book).Asks[i+1:], (*book).Asks[i:])
-				(*book).Asks[i] = []float64{ask[0], ask[1]}
+				(*book).Asks[i] = []float32{ask[0], ask[1]}
 			}
 
 			break
@@ -182,7 +182,7 @@ func ApplyDiff(book *OrderBook, diff *OrderBookDiff) (error) {
 	for _, bid := range (*diff).Bids {
 		if len((*book).Bids) == 0 || (*book).Bids[len((*book).Bids) - 1][0] > bid[0] {
 			// inserting at the end
-			(*book).Bids = append((*book).Bids, []float64{bid[0], bid[1]})
+			(*book).Bids = append((*book).Bids, []float32{bid[0], bid[1]})
 			continue
 		}
 
@@ -209,9 +209,9 @@ func ApplyDiff(book *OrderBook, diff *OrderBookDiff) (error) {
 				}
 
 				// inserting a new price level at (i)-th position
-				(*book).Bids = append((*book).Bids, []float64{})
+				(*book).Bids = append((*book).Bids, []float32{})
 				copy((*book).Bids[i+1:], (*book).Bids[i:])
-				(*book).Bids[i] = []float64{bid[0], bid[1]}
+				(*book).Bids[i] = []float32{bid[0], bid[1]}
 			}
 
 			break
