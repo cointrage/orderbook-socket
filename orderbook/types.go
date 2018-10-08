@@ -36,6 +36,14 @@ const (
 	Kraken
 )
 
+func (e ExchangeName) String() string {
+	return [...]string{"Idex", "EtherDelta", "ForkDelta", "Binance", "HitBTC", "Mercatox", 
+	"Huobi", "Hadax", "Bitfinex", "Ethfinex", "Coinex", "Kucoin", "Okex", "Bittrex", "Bibox",
+	"Bilaxy", "Tidex", "Ddex", "Coinegg", "Lbank", "BigOne", "Coinbene", "Liqui", "Cobinhood",
+	"Gate", "Bcex", "Kraken"}[e]
+}
+
+
 type MarketName uint8
 const (
 	BTC = iota
