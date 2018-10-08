@@ -1,6 +1,7 @@
 package orderbook
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -39,7 +40,9 @@ type MarketName uint8
 const (
 	BTC = iota
 	ETH
-	USDT	
+	USDT
+	TUSD
+	USD
 )
 
 type OrderBook struct {
@@ -67,4 +70,21 @@ type Message struct {
 	Ts time.Time
 	Type MessageType
 	Data string
+}
+
+func ParseMarket(string market) (MarketName, error) {
+	switch market {
+	case "BTC":
+		return BTC, nil
+	case "ETH":
+		return ETH, nil
+	case "USDT":
+		return USDT, nil
+	case "TUSD":
+		return TUSD, nil
+	case "USD":
+		return USD, nil
+	default:
+		return 0, fmt.Errorf("could not parse market: %s", market)
+	}
 }
