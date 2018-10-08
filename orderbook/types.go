@@ -72,7 +72,7 @@ type Message struct {
 	Data string
 }
 
-func ParseMarket(market string) (MarketName, error) {
+func ParseMarket(market string) (MarketName) {
 	switch market {
 	case "BTC":
 		return BTC, nil
@@ -85,6 +85,6 @@ func ParseMarket(market string) (MarketName, error) {
 	case "USD":
 		return USD, nil
 	default:
-		return 0, fmt.Errorf("could not parse market: %s", market)
+		panic(fmt.Errorf("could not parse market: %s", market))
 	}
 }
