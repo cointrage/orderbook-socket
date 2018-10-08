@@ -43,6 +43,7 @@ const (
 	USDT
 	TUSD
 	USD
+	USDC
 )
 
 type OrderBook struct {
@@ -84,6 +85,8 @@ func ParseMarket(market string) (MarketName) {
 		return TUSD
 	case "USD":
 		return USD
+	case "USDC":
+		return USDC
 	default:
 		panic(fmt.Errorf("could not parse market: %s", market))
 	}
