@@ -46,6 +46,29 @@ const (
 	USDC
 )
 
+func ParseMarket(market string) (MarketName) {
+	switch market {
+	case "BTC":
+		return BTC
+	case "ETH":
+		return ETH
+	case "USDT":
+		return USDT
+	case "TUSD":
+		return TUSD
+	case "USD":
+		return USD
+	case "USDC":
+		return USDC
+	default:
+		panic(fmt.Errorf("could not parse market: %s", market))
+	}
+}
+
+func (m MarketName) String() string {
+	return [...]string{"BTC", "ETH", "USDT", "TUSD", "USD", "USDC"}[m]
+}
+
 type OrderBook struct {
 	LastUpdateId int64
 	Exchange ExchangeName
@@ -71,23 +94,4 @@ type Message struct {
 	Ts time.Time
 	Type MessageType
 	Data string
-}
-
-func ParseMarket(market string) (MarketName) {
-	switch market {
-	case "BTC":
-		return BTC
-	case "ETH":
-		return ETH
-	case "USDT":
-		return USDT
-	case "TUSD":
-		return TUSD
-	case "USD":
-		return USD
-	case "USDC":
-		return USDC
-	default:
-		panic(fmt.Errorf("could not parse market: %s", market))
-	}
 }
