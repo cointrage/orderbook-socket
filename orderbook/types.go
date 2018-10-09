@@ -52,6 +52,7 @@ const (
 	TUSD
 	USD
 	USDC
+	GUSD
 	BNB
 )
 
@@ -69,6 +70,8 @@ func ParseMarket(market string) (MarketName) {
 		return USD
 	case "USDC":
 		return USDC
+	case "GUSD":
+		return GUSD
 	case "BNB":
 		return BNB
 	default:
@@ -77,7 +80,7 @@ func ParseMarket(market string) (MarketName) {
 }
 
 func (m MarketName) String() string {
-	return [...]string{"BTC", "ETH", "USDT", "TUSD", "USD", "USDC", "BNB"}[m]
+	return [...]string{"BTC", "ETH", "USDT", "TUSD", "USD", "USDC", "GUSD", "BNB"}[m]
 }
 
 type OrderBook struct {
