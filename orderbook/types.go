@@ -55,6 +55,7 @@ const (
 	GUSD
 	BNB
 	BIX
+	DAI
 )
 
 func ParseMarket(market string) (MarketName) {
@@ -77,13 +78,15 @@ func ParseMarket(market string) (MarketName) {
 		return BNB
 	case "BIX":
 		return BIX
+	case "DAI":
+		return DAI
 	default:
 		panic(fmt.Errorf("could not parse market: %s", market))
 	}
 }
 
 func (m MarketName) String() string {
-	return [...]string{"BTC", "ETH", "USDT", "TUSD", "USD", "USDC", "GUSD", "BNB", "BIX"}[m]
+	return [...]string{"BTC", "ETH", "USDT", "TUSD", "USD", "USDC", "GUSD", "BNB", "BIX", "DAI"}[m]
 }
 
 type OrderBook struct {
