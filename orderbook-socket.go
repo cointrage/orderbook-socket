@@ -15,7 +15,7 @@ const (
 	socketPort = 3009
 )
 
-type client chan<- string // an outgoing message channel
+type client chan<- []byte // an outgoing message channel
 
 type clientMessage struct {
 	Client  client
@@ -68,17 +68,17 @@ func broadcaster() {
 			}
 
 			switch message.Type {
-			case orderbook.MessageSubscribe:
+			case orderbook.MessageType_SubscribeMessage:
 				// registering client as subscriber
 				subscribers[(*msg).Client] = true
 
-			case orderbook.MessageBook:
+			case orderbook.MessageType_OrderBookMessage:
 				// broadcast orderbook message to all subscribers
 				for cli := range subscribers {
 					cli <- (*msg).Message
 				}
 
-			case orderbook.MessageDiff:
+			case orderbook.MessageType_OrderBookDiffMessage:
 				// broadcast orderbook message to all subscribers
 				for cli := range subscribers {
 					cli <- (*msg).Message
@@ -102,7 +102,7 @@ func broadcaster() {
 
 func handleConn(conn net.Conn) {
 
-	ch := make(chan string) // outgoing client messages
+	ch := make(chan []byte) // outgoing client messages
 	clientAddr := conn.RemoteAddr().String()
 
 	go clientWriter(conn, ch)
@@ -131,7 +131,7 @@ func handleConn(conn net.Conn) {
 	conn.Close()
 }
 
-func clientWriter(conn net.Conn, ch <-chan string) {
+func clientWriter(conn net.Conn, ch <-chan []byte) {
 	for msg := range ch {
 		fmt.Fprint(conn, msg) // NOTE: ignoring network errors
 	}
