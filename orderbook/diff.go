@@ -5,10 +5,10 @@ import (
 	"sort"
 )
 
-type byPriceAsc [][]float32
+type byPriceAsc []*Order
 
 func (x byPriceAsc) Len() int { return len(x) }
-func (x byPriceAsc) Less(i, j int) bool { return x[i][0] < x[j][0] }
+func (x byPriceAsc) Less(i, j int) bool { return x[i].Price < x[j].Price }
 func (x byPriceAsc) Swap(i, j int) { x[i], x[j] = x[j], x[i] }
 
 // Copies orderbook values to new structure
@@ -23,16 +23,16 @@ func Copy(book *OrderBook) (*OrderBook) {
 		Exchange: (*book).Exchange,
 		Market: (*book).Market,
 		Ticker: (*book).Ticker,
-		Asks: make([][]float32, 0),
-		Bids: make([][]float32, 0),
+		Asks: make([]*Order, 0),
+		Bids: make([]*Order, 0),
 	}
 
 	for _, ask := range (*book).Asks {
-		cp.Asks = append(cp.Asks, []float32{ask[0], ask[1]})
+		cp.Asks = append(cp.Asks, &Order{Price: ask.Price, Quantity: ask.Quantity})
 	}
 
 	for _, bid := range (*book).Bids {
-		cp.Bids = append(cp.Bids, []float32{bid[0], bid[1]})
+		cp.Bids = append(cp.Bids, &Order{Price: bid.Price, Quantity: bid.Quantity})
 	}
 
 	return cp
@@ -52,12 +52,12 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 	}
 
 	// building asks diff
-	asks := make([][]float32, 0)
+	asks := make([]*Order, 0)
 	for _, ask1 := range (*o1).Asks {
 
 		found := false
 		for _, ask2 := range (*o2).Asks {
-			if ask1[0] == ask2[0] {
+			if ask1.Price == ask2.Price {
 				found = true
 				break
 			}
@@ -65,7 +65,7 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 
 		if !found {
 			// removing the price level
-			asks = append(asks, []float32{ask1[0], 0})
+			asks = append(asks, &Order{Price: ask1.Price, Quantity: 0})
 		}
 	}
 
@@ -73,16 +73,16 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 
 		found := false
 		for _, ask1 := range (*o1).Asks {
-			if ask2[0] == ask1[0] && ask2[1] != ask1[1] {
+			if ask2.Price == ask1.Price && ask2.Quantity != ask1.Quantity {
 				// updating price level
-				asks = append(asks, []float32{ask2[0], ask2[1]})
+				asks = append(asks, &Order{Price: ask2.Price, Quantity: ask2.Quantity})
 				break
 			}
 		}
 
 		if !found {
 			// adding price level
-			asks = append(asks, []float32{ask2[0], ask2[1]})
+			asks = append(asks, &Order{Price: ask2.Price, Quantity: ask2.Quantity})
 		}
 	}
 
@@ -91,12 +91,12 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 	diff.Asks = asks
 
 	// building bids diff
-	bids := make([][]float32, 0)
+	bids := make([]*Order, 0)
 	for _, bid1 := range (*o1).Bids {
 
 		found := false
 		for _, bid2 := range (*o2).Bids {
-			if bid1[0] == bid2[0] {
+			if bid1.Price == bid2.Price {
 				found = true
 				break
 			}
@@ -104,7 +104,7 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 
 		if !found {
 			// removing the price level
-			bids = append(bids, []float32{bid1[0], 0})
+			bids = append(bids, &Order{Price: bid1.Price, Quantity: 0})
 		}
 	}
 
@@ -112,16 +112,16 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 
 		found := false
 		for _, bid1 := range (*o1).Bids {
-			if bid2[0] == bid1[0] && bid2[1] != bid1[1] {
+			if bid2.Price == bid1.Price && bid2.Quantity != bid1.Quantity {
 				// updating price level
-				bids = append(bids, []float32{bid2[0], bid2[1]})
+				bids = append(bids, &Order{Price: bid2.Price, Quantity: bid2.Quantity})
 				break
 			}
 		}
 
 		if !found {
 			// adding price level
-			bids = append(bids, []float32{bid2[0], bid2[1]})
+			bids = append(bids, &Order{Price: bid2.Price, Quantity: bid2.Quantity})
 		}
 	}
 
@@ -140,38 +140,38 @@ func ApplyDiff(book *OrderBook, diff *OrderBookDiff) (error) {
 
 	// updating asks
 	for _, ask := range (*diff).Asks {
-		if len((*book).Asks) == 0 || (*book).Asks[len((*book).Asks) - 1][0] < ask[0] {
+		if len((*book).Asks) == 0 || (*book).Asks[len((*book).Asks) - 1].Price < ask.Price {
 			// inserting at the end
-			(*book).Asks = append((*book).Asks, []float32{ask[0], ask[1]})
+			(*book).Asks = append((*book).Asks, &Order{Price: ask.Price, Quantity: ask.Quantity})
 			continue
 		}
 
 		for i := 0; i < len((*book).Asks); i += 1 {
 			oask := (*book).Asks[i] 
-			if oask[0] < ask[0] {
+			if oask.Price < ask.Price {
 				continue
 			}
 
-			if oask[0] == ask[0] {
+			if oask.Price == ask.Price {
 				// updating or deleting a price level
-				if ask[1] == 0 {
+				if ask.Quantity == 0 {
 					// removing price level
 					(*book).Asks = append((*book).Asks[:i], (*book).Asks[i+1:]...)
 				} else {
 					// updating quantity
-					oask[1] = ask[1]
+					oask.Quantity = ask.Quantity
 				}
 			} else {
 
-				if ask[1] == 0 {
+				if ask.Quantity == 0 {
 					// nothing to do
 					continue
 				}
 
 				// inserting a new price level at (i)-th position
-				(*book).Asks = append((*book).Asks, []float32{})
+				(*book).Asks = append((*book).Asks, nil)
 				copy((*book).Asks[i+1:], (*book).Asks[i:])
-				(*book).Asks[i] = []float32{ask[0], ask[1]}
+				(*book).Asks[i] = &Order{Price: ask.Price, Quantity: ask.Quantity}
 			}
 
 			break
@@ -180,38 +180,38 @@ func ApplyDiff(book *OrderBook, diff *OrderBookDiff) (error) {
 
 	// updating bids
 	for _, bid := range (*diff).Bids {
-		if len((*book).Bids) == 0 || (*book).Bids[len((*book).Bids) - 1][0] > bid[0] {
+		if len((*book).Bids) == 0 || (*book).Bids[len((*book).Bids) - 1].Price > bid.Price {
 			// inserting at the end
-			(*book).Bids = append((*book).Bids, []float32{bid[0], bid[1]})
+			(*book).Bids = append((*book).Bids, &Order{Price: bid.Price, Quantity: bid.Quantity})
 			continue
 		}
 
 		for i := 0; i < len((*book).Bids); i += 1 {
 			obid := (*book).Bids[i] 
-			if obid[0] > bid[0] {
+			if obid.Price > bid.Price {
 				continue
 			}
 
-			if obid[0] == bid[0] {
+			if obid.Price == bid.Price {
 				// updating or deleting a price level
-				if bid[1] == 0 {
+				if bid.Quantity == 0 {
 					// removing price level
 					(*book).Bids = append((*book).Bids[:i], (*book).Bids[i+1:]...)
 				} else {
 					// updating quantity
-					obid[1] = bid[1]
+					obid.Quantity = bid.Quantity
 				}
 			} else {
 
-				if bid[1] == 0 {
+				if bid.Quantity == 0 {
 					// nothing to do
 					continue
 				}
 
 				// inserting a new price level at (i)-th position
-				(*book).Bids = append((*book).Bids, []float32{})
+				(*book).Bids = append((*book).Bids, nil)
 				copy((*book).Bids[i+1:], (*book).Bids[i:])
-				(*book).Bids[i] = []float32{bid[0], bid[1]}
+				(*book).Bids[i] = &Order{Price: bid.Price, Quantity: bid.Quantity}
 			}
 
 			break
@@ -228,12 +228,12 @@ func Print(orderbook *OrderBook) {
 	fmt.Printf("\033[0;0H\n")
 
 	for i := 4; i >= 0; i -= 1 {
-		fmt.Printf("%0.10f \t %0.10f\n", orderbook.Asks[i][0], orderbook.Asks[i][1])
+		fmt.Printf("%0.10f \t %0.10f\n", orderbook.Asks[i].Price, orderbook.Asks[i].Quantity)
 	}
 
 	fmt.Println("------------------------------")
 
 	for _, bid := range orderbook.Bids[:5] {
-		fmt.Printf("%0.10f \t %0.10f\n", bid[0], bid[1])
+		fmt.Printf("%0.10f \t %0.10f\n", bid.Price, bid.Quantity)
 	}
 }

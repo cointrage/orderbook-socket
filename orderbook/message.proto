@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package orderbook;
+
+enum MessageType {
+	UnknownMessageType = 0;
+	OrderBookMessage = 1;
+	OrderBookDiffMessage = 2;
+	SubscribeMessage = 3;
+}
+
+message Message {
+	int64 Ts = 1;
+	MessageType Type = 2;
+	bytes Data = 3;
+}

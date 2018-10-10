@@ -4,11 +4,11 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net"
 	"github.com/cointrage/orderbook-socket/orderbook"
+	"github.com/golang/protobuf/proto"
 )
 
 const (
@@ -19,7 +19,7 @@ type client chan<- string // an outgoing message channel
 
 type clientMessage struct {
 	Client  client
-	Message string
+	Message []byte
 }
 
 var (
@@ -61,9 +61,9 @@ func broadcaster() {
 		case msg := <-messages:
 
 			// decoding message
-			var message orderbook.Message
-			if err := json.Unmarshal([]byte((*msg).Message), &message); err != nil {
-				log.Printf("could not parse incoming message: %v, %v", err, (*msg).Message)
+			message := &orderbook.Message{}
+			if err := proto.Unmarshal((*msg).Message, message); err != nil {
+				log.Printf("could not parse incoming message: %v, %s", err, (*msg).Message)
 				continue
 			}
 
@@ -114,13 +114,13 @@ func handleConn(conn net.Conn) {
 	// reading input
 	r := bufio.NewReader(conn)
 	for {
-		str, err := r.ReadString('\n')
+		b, err := r.ReadBytes(byte('\n'))
 		if err != nil {
 			log.Printf("socket read error: %v", err)
 			break
 		}
 
-		messages <- &clientMessage{ch, str[:len(str)-1]}
+		messages <- &clientMessage{ch, b}
 	}
 
 	// deregistering client
@@ -133,6 +133,6 @@ func handleConn(conn net.Conn) {
 
 func clientWriter(conn net.Conn, ch <-chan string) {
 	for msg := range ch {
-		fmt.Fprintln(conn, msg) // NOTE: ignoring network errors
+		fmt.Fprint(conn, msg) // NOTE: ignoring network errors
 	}
 }
