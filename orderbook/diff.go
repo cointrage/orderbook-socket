@@ -46,9 +46,7 @@ func MakeDiff(o1 *OrderBook, o2 *OrderBook) (*OrderBookDiff, error) {
 
 	diff := &OrderBookDiff{
 		FirstUpdateId: (*o1).LastUpdateId,
-		OrderBook: OrderBook{
-			LastUpdateId: (*o2).LastUpdateId,
-		},
+		LastUpdateId: (*o2).LastUpdateId,
 	}
 
 	// building asks diff
