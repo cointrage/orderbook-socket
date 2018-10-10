@@ -3,24 +3,23 @@ package main
 // Broadcasting socket server for orderbook messages.
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"net"
 	"github.com/cointrage/orderbook-socket/orderbook"
-	"github.com/golang/protobuf/proto"
+	"github.com/gogo/protobuf/io"
 )
 
 const (
 	socketPort = 3009
-	delimeter  = byte('\r')
+	readLimit  = 100000
 )
 
-type client chan<- []byte // an outgoing message channel
+type client chan<- *orderbook.Message // an outgoing message channel
 
 type clientMessage struct {
 	Client  client
-	Message []byte
+	Message *orderbook.Message
 }
 
 var (
@@ -61,12 +60,7 @@ func broadcaster() {
 		select {
 		case msg := <-messages:
 
-			// decoding message
-			message := &orderbook.Message{}
-			if err := proto.Unmarshal((*msg).Message, message); err != nil {
-				log.Printf("could not parse incoming message: %v", err)
-				continue
-			}
+			message := msg.Message
 
 			switch message.Type {
 			case orderbook.MessageType_SubscribeMessage:
@@ -103,7 +97,7 @@ func broadcaster() {
 
 func handleConn(conn net.Conn) {
 
-	ch := make(chan []byte) // outgoing client messages
+	ch := make(chan *orderbook.Message) // outgoing client messages
 	clientAddr := conn.RemoteAddr().String()
 
 	go clientWriter(conn, ch)
@@ -113,15 +107,17 @@ func handleConn(conn net.Conn) {
 	entering <- ch
 
 	// reading input
-	r := bufio.NewReader(conn)
+	r := io.NewDelimitedReader(conn, readLimit)
 	for {
-		b, err := r.ReadBytes(delimeter)
-		if err != nil {
+		msg := &orderbook.Message{}
+		if err := r.ReadMsg(msg); err != nil {
 			log.Printf("socket read error: %v", err)
 			break
 		}
 
-		messages <- &clientMessage{ch, b}
+		log.Printf("type %d, bytes %d", msg.Type, len(msg.Data))
+
+		messages <- &clientMessage{ch, msg}
 	}
 
 	// deregistering client
@@ -132,8 +128,11 @@ func handleConn(conn net.Conn) {
 	conn.Close()
 }
 
-func clientWriter(conn net.Conn, ch <-chan []byte) {
+func clientWriter(conn net.Conn, ch <-chan *orderbook.Message) {
+
+	w := io.NewDelimitedWriter(conn)
+
 	for msg := range ch {
-		conn.Write(msg)
+		w.WriteMsg(msg)
 	}
 }
