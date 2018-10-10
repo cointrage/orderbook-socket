@@ -13,6 +13,7 @@ import (
 
 const (
 	socketPort = 3009
+	delimeter  = byte('\r')
 )
 
 type client chan<- []byte // an outgoing message channel
@@ -63,7 +64,7 @@ func broadcaster() {
 			// decoding message
 			message := &orderbook.Message{}
 			if err := proto.Unmarshal((*msg).Message, message); err != nil {
-				log.Printf("could not parse incoming message: %v, %s", err, (*msg).Message)
+				log.Printf("could not parse incoming message: %v", err)
 				continue
 			}
 
@@ -114,7 +115,7 @@ func handleConn(conn net.Conn) {
 	// reading input
 	r := bufio.NewReader(conn)
 	for {
-		b, err := r.ReadBytes(byte('\n'))
+		b, err := r.ReadBytes(delimeter)
 		if err != nil {
 			log.Printf("socket read error: %v", err)
 			break
@@ -133,6 +134,6 @@ func handleConn(conn net.Conn) {
 
 func clientWriter(conn net.Conn, ch <-chan []byte) {
 	for msg := range ch {
-		fmt.Fprint(conn, msg) // NOTE: ignoring network errors
+		conn.Write(msg)
 	}
 }
