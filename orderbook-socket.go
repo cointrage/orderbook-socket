@@ -115,8 +115,6 @@ func handleConn(conn net.Conn) {
 			break
 		}
 
-		log.Printf("type %d, bytes %d", msg.Type, len(msg.Data))
-
 		messages <- &clientMessage{ch, msg}
 	}
 
