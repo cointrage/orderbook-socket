@@ -8,6 +8,7 @@ ADD . /app/
 WORKDIR /app 
 
 RUN go get github.com/cointrage/orderbook-socket/orderbook
+RUN go get github.com/gogo/protobuf/io
 
 RUN go build -o main . 
 
