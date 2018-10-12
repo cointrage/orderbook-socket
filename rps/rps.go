@@ -24,7 +24,7 @@ func New(rps float64) *RPS {
     }
 }
 
-func (r *RPS) Run(task func()) {
+func (r *RPS) Run(task func(), stop chan<- struct{}) {
     
     elapsed := time.Since(r.time)
 	current := float64(r.counter)/elapsed.Seconds()
@@ -41,11 +41,31 @@ func (r *RPS) Run(task func()) {
 		// rps exceeded, sleeping for a while
 		delayms := (float64(counter)/r.rps - elapsed.Seconds()) * 1000
 
-		select {
-			case <- time.After(time.Duration(delayms) * time.Millisecond):
-				// executing task
-				task()
+		if stop != nil {
+			select {
+				case <- stop:
+					// early stopping
+
+					// reseting counter
+					r.mu.Lock()
+					r.counter -= 1
+					r.mu.Unlock()
+
+					return
+				case <- time.After(time.Duration(delayms) * time.Millisecond):
+					// executing task
+					task()
+			}
+		} else {
+			// waiting to delay to elapse
+			select {
+				case <- time.After(time.Duration(delayms) * time.Millisecond):
+					// executing task
+					task()
+			}
 		}
+
+		
 	}
     
 }

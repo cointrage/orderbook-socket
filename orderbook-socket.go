@@ -80,7 +80,7 @@ func broadcaster() {
 				}
 
 			default:
-				log.Printf("unknown message type received: %s", (*msg).Message)
+				log.Printf("unknown message type received: %s", msg.Message)
 			}
 
 		case cli := <-entering:
