@@ -48,6 +48,7 @@ enum Market {
 	BNB = 8;
 	BIX = 9;
 	DAI = 10;
+    BCH = 11;
 }
 
 message OrderBook {
