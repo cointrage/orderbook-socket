@@ -24,7 +24,7 @@ func New(rps float64) *RPS {
     }
 }
 
-func (r *RPS) Run(task func(), stop chan<- struct{}) {
+func (r *RPS) Run(task func(), stop <-chan struct{}) {
     
     elapsed := time.Since(r.time)
 	current := float64(r.counter)/elapsed.Seconds()
