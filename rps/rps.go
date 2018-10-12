@@ -3,7 +3,6 @@ package rps
 // Makes sure you do not exceed predefined rate limit. Useful for API calls.
 
 import (
-	"fmt"
 	"time"
 	"sync"
 )
@@ -46,7 +45,6 @@ func (r *RPS) Run(task func(), stop <-chan struct{}) {
 			select {
 				case <- stop:
 					// early stopping
-					fmt.Println("stop requested by caller")
 
 					// reseting counter
 					r.mu.Lock()
