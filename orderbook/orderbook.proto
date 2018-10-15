@@ -49,6 +49,7 @@ enum Market {
 	BIX = 9;
 	DAI = 10;
     BCH = 11;
+    CET = 12;
 }
 
 message OrderBook {
