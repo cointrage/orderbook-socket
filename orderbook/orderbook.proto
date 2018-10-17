@@ -53,6 +53,10 @@ enum Market {
     QTUM = 13;
     NEO = 14;
     KCS = 15;
+    EOS = 16;
+    EUR = 17;
+    GBP = 18;
+    JPY = 19;
 }
 
 message OrderBook {
