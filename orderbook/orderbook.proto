@@ -51,6 +51,8 @@ enum Market {
     BCH = 11;
     CET = 12;
     QTUM = 13;
+    NEO = 14;
+    KCS = 15;
 }
 
 message OrderBook {
