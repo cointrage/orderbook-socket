@@ -57,6 +57,7 @@ enum Market {
     EUR = 17;
     GBP = 18;
     JPY = 19;
+    COB = 20;
 }
 
 message OrderBook {
