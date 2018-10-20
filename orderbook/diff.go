@@ -238,7 +238,7 @@ func Print(orderbook *OrderBook) {
 
 	ln = 5
 	if len(orderbook.Bids) < 5 {
-		ln = len(orderbook.Asks)
+		ln = len(orderbook.Bids)
 	}
 	
 	for i := 0; i < ln; i += 1 {
