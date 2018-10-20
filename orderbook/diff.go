@@ -241,7 +241,7 @@ func Print(orderbook *OrderBook) {
 		ln = len(orderbook.Asks)
 	}
 	
-	for i := 0; i < len; i += 1 {
+	for i := 0; i < ln; i += 1 {
 		fmt.Printf("%0.10f \t %0.10f\n", orderbook.Bids[i].Price, orderbook.Bids[i].Quantity)
 	}
 }
