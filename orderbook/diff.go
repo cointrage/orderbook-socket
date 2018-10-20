@@ -225,13 +225,23 @@ func Print(orderbook *OrderBook) {
 
 	fmt.Printf("\033[0;0H\n")
 
-	for i := 4; i >= 0; i -= 1 {
+	ln := 5
+	if len(orderbook.Asks) < 5 {
+		ln = len(orderbook.Asks)
+	}
+
+	for i := ln - 1; i >= 0; i -= 1 {
 		fmt.Printf("%0.10f \t %0.10f\n", orderbook.Asks[i].Price, orderbook.Asks[i].Quantity)
 	}
 
 	fmt.Println("------------------------------")
 
-	for _, bid := range orderbook.Bids[:5] {
-		fmt.Printf("%0.10f \t %0.10f\n", bid.Price, bid.Quantity)
+	ln = 5
+	if len(orderbook.Bids) < 5 {
+		ln = len(orderbook.Asks)
+	}
+	
+	for i := 0; i < len; i += 1 {
+		fmt.Printf("%0.10f \t %0.10f\n", orderbook.Bids[i].Price, orderbook.Bids[i].Quantity)
 	}
 }
