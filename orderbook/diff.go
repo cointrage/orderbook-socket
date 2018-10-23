@@ -222,8 +222,11 @@ func ApplyDiff(book *OrderBook, diff *OrderBookDiff) (error) {
 }
 
 func Print(orderbook *OrderBook) {
-
 	fmt.Printf("\033[0;0H\n")
+	Println(orderbook)
+}
+
+func Println(orderbook *OrderBook) {
 
 	ln := 5
 	if len(orderbook.Asks) < 5 {
