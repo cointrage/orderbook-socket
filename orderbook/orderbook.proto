@@ -34,6 +34,7 @@ enum Exchange {
     Liquid = 28;
     Gdax = 29;
     Poloniex = 30;
+    Bitz = 31;
 }
 
 enum Market {
