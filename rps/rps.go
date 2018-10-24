@@ -3,6 +3,7 @@ package rps
 // Makes sure you do not exceed predefined rate limit. Useful for API calls.
 
 import (
+	"fmt"
 	"time"
 	"sync"
 )
@@ -35,6 +36,7 @@ func (r *RPS) Run(task func(), stop <-chan struct{}) (bool) {
 	counter := r.counter
 	r.mu.Unlock()
 
+	fmt.Printf("%.2f\n", current)
 	if current <= r.rps {
 		task()
 		return true
