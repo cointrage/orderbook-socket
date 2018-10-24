@@ -3,7 +3,6 @@ package rps
 // Makes sure you do not exceed predefined rate limit. Useful for API calls.
 
 import (
-	"fmt"
 	"time"
 	"sync"
 )
