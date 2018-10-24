@@ -36,7 +36,6 @@ func (r *RPS) Run(task func(), stop <-chan struct{}) (bool) {
 	counter := r.counter
 	r.mu.Unlock()
 
-	fmt.Printf("%.2f\n", current)
 	if current <= r.rps {
 		task()
 		return true
@@ -44,6 +43,7 @@ func (r *RPS) Run(task func(), stop <-chan struct{}) (bool) {
 
 	// rps exceeded, sleeping for a while
 	delayms := (float64(counter)/r.rps - elapsed.Seconds()) * 1000
+	fmt.Printf("%.2f\n", delayms)
 
 	if stop != nil {
 		select {
