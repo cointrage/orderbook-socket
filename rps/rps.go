@@ -19,7 +19,6 @@ type RPS struct {
 func New(rps float64) *RPS {
     return &RPS{
     	rps: rps,
-    	time: time.Now(),
     	mu: sync.Mutex{},
         work: make(chan func()),
     }
@@ -29,12 +28,17 @@ func (r *RPS) Run(task func(), stop <-chan struct{}) (bool) {
     
 	// incrementing counter
 	r.mu.Lock()
+	
+	if r.counter == 0 {
+		// reseting time for the first call
+		r.time = time.Now()
+	}
+
+	r.counter += 1
+	counter := r.counter
 
 	elapsed := time.Since(r.time)
 	current := float64(r.counter)/elapsed.Seconds()
-	
-	r.counter += 1
-	counter := r.counter
 	
 	fmt.Printf("counter %d, rps: %0.1f, current rps %0.1f\n", r.counter, r.rps, current)
 
