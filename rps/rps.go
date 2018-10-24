@@ -27,10 +27,10 @@ func New(rps float64) *RPS {
 func (r *RPS) Run(task func(), stop <-chan struct{}) (bool) {
     
     elapsed := time.Since(r.time)
-	current := float64(r.counter)/elapsed.Seconds()
 
 	// incrementing counter
 	r.mu.Lock()
+	current := float64(r.counter)/elapsed.Seconds()
 	r.counter += 1
 	counter := r.counter
 	r.mu.Unlock()
