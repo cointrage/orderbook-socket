@@ -27,14 +27,17 @@ func New(rps float64) *RPS {
 
 func (r *RPS) Run(task func(), stop <-chan struct{}) (bool) {
     
-    elapsed := time.Since(r.time)
-
 	// incrementing counter
 	r.mu.Lock()
+
+	elapsed := time.Since(r.time)
 	current := float64(r.counter)/elapsed.Seconds()
+	
 	r.counter += 1
 	counter := r.counter
-	fmt.Printf("counter %d, rps: %0.1f, current rps %0.1f", r.counter, r.rps, current)
+	
+	fmt.Printf("counter %d, rps: %0.1f, current rps %0.1f\n", r.counter, r.rps, current)
+
 	r.mu.Unlock()
 
 	if current <= r.rps {
