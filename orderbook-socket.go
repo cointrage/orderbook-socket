@@ -8,11 +8,13 @@ import (
 	"net"
 	"github.com/cointrage/orderbook-socket/orderbook"
 	"github.com/gogo/protobuf/io"
+	"time"
 )
 
 const (
 	socketPort = 3009
 	readLimit  = 100000
+	statsLimit = 100000
 )
 
 type client chan<- *orderbook.Message // an outgoing message channel
@@ -56,12 +58,31 @@ func broadcaster() {
 	clients := make(map[client]bool)     // all connected clients
 	subscribers := make(map[client]bool) // subscribers for broadcasting
 
+	start := time.Now()
+	var counter int64
+	var totalsize int64
+
 	for {
 		select {
 		case msg := <-messages:
 
 			message := msg.Message
 
+			// recording statistics
+			counter++
+			totalsize += int64(len(message.Data))
+			if counter % statsLimit == 0 {
+				avgrate := float32(counter)/float32(time.Since(start).Seconds())
+				avgsize := float32(totalsize)/float32(counter)
+				log.Printf("performing at avg. rate %0.1f msgs/s with avg. message size %0.1f bytes", avgrate, avgsize)
+
+				// reset
+				start = time.Now()
+				counter = 0
+				totalsize = 0
+			}
+
+			// handling message
 			switch message.Type {
 			case orderbook.MessageType_SubscribeMessage:
 				// registering client as subscriber
@@ -70,13 +91,13 @@ func broadcaster() {
 			case orderbook.MessageType_OrderBookMessage:
 				// broadcast orderbook message to all subscribers
 				for cli := range subscribers {
-					cli <- (*msg).Message
+					cli <- message
 				}
 
 			case orderbook.MessageType_OrderBookDiffMessage:
 				// broadcast orderbook message to all subscribers
 				for cli := range subscribers {
-					cli <- (*msg).Message
+					cli <- message
 				}
 
 			default:
