@@ -34,6 +34,7 @@ func (r *RPS) Run(task func(), stop <-chan struct{}) (bool) {
 	current := float64(r.counter)/elapsed.Seconds()
 	r.counter += 1
 	counter := r.counter
+	fmt.Printf("counter %d, rps: %0.1f, current rps %0.1f", r.counter, r.rps, current)
 	r.mu.Unlock()
 
 	if current <= r.rps {
