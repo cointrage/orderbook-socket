@@ -59,6 +59,7 @@ enum Market {
     GBP = 18;
     JPY = 19;
     COB = 20;
+    PAX = 21;
 }
 
 message OrderBook {
