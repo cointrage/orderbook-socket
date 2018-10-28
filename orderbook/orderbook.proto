@@ -32,9 +32,10 @@ enum Exchange {
     Bcex = 26;
     Kraken = 27;
     Liquid = 28;
-    Gdax = 29;
+    Coinbase = 29;
     Poloniex = 30;
     Bitz = 31;
+    Switcheo = 32;
 }
 
 enum Market {
@@ -60,6 +61,8 @@ enum Market {
     JPY = 19;
     COB = 20;
     PAX = 21;
+    GAS = 22;
+    SWTH = 23;
 }
 
 message OrderBook {
