@@ -36,6 +36,7 @@ enum Exchange {
 	Poloniex = 30;
 	Bitz = 31;
 	Switcheo = 32;
+	Idax = 33;
 }
 
 enum Market {
