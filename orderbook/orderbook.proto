@@ -38,6 +38,7 @@ enum Exchange {
 	Switcheo = 32;
 	Idax = 33;
 	Tokenstore = 34;
+	EthfinexT = 35;
 }
 
 enum Market {
