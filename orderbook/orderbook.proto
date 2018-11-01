@@ -66,6 +66,7 @@ enum Market {
 	PAX = 21;
 	GAS = 22;
 	SWTH = 23;
+	KRW = 24;
 }
 
 message OrderBook {
