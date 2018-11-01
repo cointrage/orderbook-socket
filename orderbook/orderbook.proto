@@ -39,6 +39,7 @@ enum Exchange {
 	Idax = 33;
 	Tokenstore = 34;
 	Bithumb = 35;
+	BithumbDex = 36;
 }
 
 enum Market {
