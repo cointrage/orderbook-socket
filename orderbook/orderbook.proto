@@ -68,6 +68,13 @@ enum Market {
 	GAS = 22;
 	SWTH = 23;
 	KRW = 24;
+	QASH = 25;
+	CNY = 26;
+	INR = 27;
+	SGD = 28;
+	AUD = 29;
+	IDR = 30;
+	HKD = 31;
 }
 
 message OrderBook {
