@@ -80,6 +80,7 @@ enum Market {
 	ZB = 32;
 	QC = 33;
 	LTC = 34;
+	DOGE = 35;
 }
 
 message OrderBook {
