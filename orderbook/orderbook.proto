@@ -79,6 +79,7 @@ enum Market {
 	HKD = 31;
 	ZB = 32;
 	QC = 33;
+	LTC = 34;
 }
 
 message OrderBook {
