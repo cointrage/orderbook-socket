@@ -40,6 +40,7 @@ enum Exchange {
 	Tokenstore = 34;
 	Bithumb = 35;
 	BithumbDex = 36;
+	ZBcom = 37;
 }
 
 enum Market {
@@ -75,6 +76,8 @@ enum Market {
 	AUD = 29;
 	IDR = 30;
 	HKD = 31;
+	ZB = 32;
+	QC = 33;
 }
 
 message OrderBook {
