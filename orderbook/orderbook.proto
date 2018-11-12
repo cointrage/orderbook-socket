@@ -42,6 +42,7 @@ enum Exchange {
 	BithumbDex = 36;
 	ZBcom = 37;
 	Cryptopia = 38;
+	Hotbit = 39;
 }
 
 enum Market {
