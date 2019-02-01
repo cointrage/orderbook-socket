@@ -82,6 +82,13 @@ enum Market {
 	QC = 33;
 	LTC = 34;
 	DOGE = 35;
+	WBTC = 36;
+	WETH = 37;
+	CNYX = 38;
+	HTB = 39;
+	USDS = 40;
+	HUSD = 41;
+	HT = 42;
 }
 
 message OrderBook {
