@@ -89,6 +89,7 @@ enum Market {
 	USDS = 40;
 	HUSD = 41;
 	HT = 42;
+	WAVES = 43;
 }
 
 message OrderBook {
