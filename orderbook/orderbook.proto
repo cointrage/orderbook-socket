@@ -43,6 +43,7 @@ enum Exchange {
 	ZBcom = 37;
 	Cryptopia = 38;
 	Hotbit = 39;
+	Upbit = 40;
 }
 
 enum Market {
