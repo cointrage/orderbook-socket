@@ -5,7 +5,7 @@ package orderbook;
 import "orderbook.proto";
 
 message ArbitrageBooksMessage {
-	OrderBook book1 = 1;
-	OrderBook book2 = 2;
-	OrderBook crossbook = 3;
+	OrderBook Book1 = 1;
+	OrderBook Book2 = 2;
+	OrderBook Crossbook = 3;
 }

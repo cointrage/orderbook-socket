@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package orderbook;
+
+import "orderbook.proto";
+
+message ArbitrageMessage {
+	float Percent = 1;
+	Exchange Ex1 = 2;
+	Exchange Ex2 = 3;
+	Market Market1 = 4;
+	Market Market2 = 5;
+	Market CrossMarket1 = 6;
+	Market CrossMarket2 = 7;
+	string Ticker = 8;
+	float MinAskPrice = 9;
+	float MaxAskPrice = 10;
+	float MinBidPrice = 11;
+	float MaxBidPrice = 12;
+	float CrossMarketMinBidPrice = 13;
+	float CrossMarketMaxBidPrice = 14;
+	float Tokens = 15;
+	float Size = 16;
+	float Profit = 17;
+	float SupportSize = 18;
+}
