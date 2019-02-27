@@ -44,6 +44,7 @@ enum Exchange {
 	Cryptopia = 38;
 	Hotbit = 39;
 	Upbit = 40;
+	Bitmax = 41;
 }
 
 enum Market {
